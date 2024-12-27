@@ -349,12 +349,12 @@ char_map = {
         ((5, 7), (7, 7))    # Bottom right horizontal line
     ],
     'S': [
-        ((10, 0), (0, 0)),  # Bottom horizontal line
-        ((0, 0), (0, 5)),   # Left bottom vertical line
-        ((0, 5), (10, 5)),  # Middle horizontal line
-        ((10, 5), (10, 10)),  # Right top vertical line
-        ((10, 10), (0, 10)),  # Top horizontal line
-        ((0, 10), (0, 5))   # Left top vertical line
+        ((0, 0), (10, 0)),  # Bottom horizontal line
+        ((10, 0), (10, 5)),   # Left bottom vertical line
+        ((10, 5), (0, 5)),  # Middle horizontal line
+        ((0, 5), (0, 10)),  # Right top vertical line
+        ((0, 10), (10, 10)),  # Top horizontal line
+  
     ],
     'A': [
         ((0, 0), (0, 10)),  # Left vertical line
