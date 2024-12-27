@@ -60,7 +60,9 @@ def reset_game():
     print("Restarting the game...")  # Log message to the console
     
 def keyboardListener(key, x, y):
-    global plane_y_change, beams, play
+    global plane_y_change, beams, play, game_over, game_complete
+    if game_complete or game_over:
+        return
     if key == b'w':
         plane_y_change += 60
     if key == b's':
@@ -228,24 +230,6 @@ def animate():
                 game_over = True
                 return
             continue
-
-        for j in range(len(beams)):
-            if j >= len(beams):
-                break
-            beam = beams[j]
-            if check_aabb_collision(bird[2], bird[3] + bird[1], 20, 10, beam[0], beam[1], 20, 2):
-                beams.pop(j)  # Deactivate beam
-                j -= 1
-                birds.pop(i)
-                i -= 1
-                score -= 1
-                birds_killed += 1
-                print("Don't kill the birds! You have killed", birds_killed, "birds.")
-                print(f"Score: {score}")
-                if birds_killed >= 3:
-                    game_over = True
-                    return
-                continue
         
         bird[2] -= 5
         if bird[2] < -250:
@@ -265,11 +249,6 @@ def animate():
 
     if level > 1 and random.randint(1, 100) <= 2:
         birds.append([True, 0, 250, random.randint(-200, 200)])
-
-    # Move beams
-    for beam in beams:
-        beam[0] += 10
-    beams = [beam for beam in beams if beam[0] <= 250]  # Remove beams that go off screen
 
     # Move clouds
     for cloud in clouds:
@@ -292,7 +271,7 @@ def animate():
             print(f"Score: {score}")
 
     # Add new cloud at random intervals
-    if random.randint(1, 100) <= 3:  # Adjust the frequency as needed
+    if level<3 and random.randint(1, 100) <= 3:  # Adjust the frequency as needed
         clouds.append([250, random.randint(-200, 200)])  # Add a new cloud starting from the right
 
     # Check for beam collisions with rocket
@@ -300,6 +279,7 @@ def animate():
         if j >= len(beams):
             break
         beam = beams[j]
+        beam[0]+=10
         for i in range(len(rockets)):
             if i >= len(rockets):
                 break
@@ -311,6 +291,24 @@ def animate():
                 i -= 1
                 score += 1  # Increase score
                 print(f"Score: {score}")
+        for i in range(len(birds)):
+            if i >= len(birds):
+                break
+            bird = birds[i]
+            if check_aabb_collision(beam[0], beam[1], 20, 10, bird[2], bird[3] + bird[1], 20, 10):
+                beams.pop(j)  # Deactivate beam
+                j -= 1
+                birds.pop(i)
+                i -= 1
+                score -= 1  # Decrease score
+                birds_killed += 1
+                print("Don't kill the birds! You have killed", birds_killed, "birds.")
+                print(f"Score: {score}")
+                if birds_killed >= 3:
+                    game_over = True
+                    return
+                continue
+
 
     if level == 3 and random.randint(1, 100) <= 3:
         rockets.append([True, 250, random.randint(-200, 200)])
@@ -367,6 +365,30 @@ char_map = {
         ((0, 10), (5, 5)),  # Diagonal line to middle
         ((5, 5), (10, 10)),  # Diagonal line to top right
         ((10, 10), (10, 0))  # Right vertical line
+    ],
+    'N': [
+        ((0, 0), (0, 10)),  # Left vertical line
+        ((0, 10), (10, 0)),  # Diagonal line to top right
+        ((10, 0), (10, 10))  # Right vertical line
+    ],
+    'I': [
+        ((5, 0), (5, 10)),  # Vertical line
+        ((0, 0), (10, 0)),  # Top horizontal line
+        ((0, 10), (10, 10))  # Bottom horizontal line
+    ],
+    'P': [
+        ((0, 0), (0, 10)),  # Left vertical line
+        ((0, 10), (10, 10)),  # Top horizontal line
+        ((10, 10), (10, 5)),  # Right vertical line
+        ((0, 5), (10, 5))  # Middle horizontal line
+    ],
+    'L': [
+        ((0, 0), (0, 10)),  # Left vertical line
+        ((0, 0), (10, 0)) # Bottom horizontal line
+    ],
+    'T': [
+        ((0, 10), (10, 10)),  # Top horizontal line
+        ((5, 10), (5, 0))  # Vertical line
     ],
     'E': [
         ((0, 0), (0, 10)),  # Left vertical line
@@ -728,7 +750,7 @@ def draw_twin_buildings():
     draw_building(x_offset + building_width + gap, y_offset, building_height, building_width, has_top_tower=False)
     
 def display():
-    global level, game_over, score
+    global level, game_over, score, game_complete, birds_killed
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glClearColor(0, 0, 0, 0)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -736,8 +758,14 @@ def display():
     glLoadIdentity()
     gluLookAt(0, 0, 200, 0, 0, 0, 0, 1, 0)
     glMatrixMode(GL_MODELVIEW)
+
+    if game_complete:
+        # Display game complete message and score
+        glColor3f(0.0, 1.0, 0.0)  # Green color
+        draw_text("MISSION COMPLETE!", -200, 20, 2)
+        draw_score_message(score)
     
-    if game_over:
+    elif game_over:
         # Display game over message and score
         glColor3f(1.0, 0.0, 0.0)  # Red color
         draw_game_over_message()
