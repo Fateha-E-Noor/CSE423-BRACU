@@ -690,7 +690,7 @@ def draw_building(x, y, height, width, has_top_tower=True):
     for i in range(1, num_floors):
         drawLine(x, y + int(i * floor_height), x + width, y + int(i * floor_height))
 
-    # Add windows for beautification
+    # Windows for beautification
     window_width = width // 4
     window_height = floor_height // 2
     glColor3f(1.0, 1.0, 1.0)  # White for windows
@@ -705,7 +705,6 @@ def draw_building(x, y, height, width, has_top_tower=True):
 
     if has_top_tower:
         tower_height = 20
-        tower_base_height = 20
         glColor3f(1.0, 0.0, 0.0)  # Red for top tower
         drawLine(x + width // 2, y + height, x + width // 2, y + height + tower_height)
         drawCircle(5, x + width // 2, y + height + tower_height + 5)
@@ -718,7 +717,7 @@ def draw_twin_buildings():
     building_height = 200  # Adjusted height to be shorter to fit within the screen
     gap = 20  # Gap between buildings
     x_offset = building_x  # Shift to the left to position buildings more within the screen
-    y_offset = -245  # Position buildings with their base touching the bottom of the blue sky area
+    y_offset = -245  # Position buildings with their base touching the ground
 
     # Draw the first building
     draw_building(x_offset, y_offset, building_height, building_width, has_top_tower=True)
@@ -741,7 +740,6 @@ def display():
         glColor3f(0.0, 1.0, 0.0)  # Green color
         draw_text("MISSION COMPLETE!", -200, 20, 2)
         draw_text(f"SCORE: {score}", -50, -20, 2)
-    
     elif game_over:
         # Display game over message and score
         glColor3f(1.0, 0.0, 0.0)  # Red color
