@@ -15,7 +15,7 @@ plane_coordinates = {
     'tail': [(-217, 9), (-226, 18), (-223, 9)],
 }
 
-plane_y_change = -100
+plane_y_change = 0
 birds = []  # List to store active birds
 passed_birds = []  # List to store birds that have passed without collision
 rockets = []  # [Active, x_position, y_position]
