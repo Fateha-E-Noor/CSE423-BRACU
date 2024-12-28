@@ -539,7 +539,9 @@ def controlButtons():
 def drawScenery():
     # Sky color
     glColor3f(0.529, 0.808, 0.922)
-    drawLine(-250, 0, 250, 0, 1000)
+    drawLine(-250, 0, 250, 0, 250)
+    drawLine(-250,125,250,125,250)
+    drawLine(-250,-125,250,-125,250)
     
     # Sun with rings
     glColor3f(1.0, 0.843, 0.0)
@@ -780,6 +782,9 @@ def display():
             drawBird()
         draw_beams()  # Draw beams
         controlButtons()
+        glColor3f(0, 0, 0)
+        draw_text("LEVEL " + str(level), -230, 200, 1)
+        draw_text("SCORE "+str(score),-100,200,1)
     
     glutSwapBuffers()
 
