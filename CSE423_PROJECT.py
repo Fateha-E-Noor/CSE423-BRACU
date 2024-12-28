@@ -17,9 +17,7 @@ plane_coordinates = {
 
 plane_y_change = 0
 birds = []  # List to store active birds
-passed_birds = []  # List to store birds that have passed without collision
 rockets = []  # [Active, x_position, y_position]
-beam = [False, -220, 0]  # [Active, x_position, y_position]
 beams = []  # List to store active beams
 clouds = []  # List to store active clouds
 score = 0
@@ -45,12 +43,10 @@ def draw_points(x, y, s=1):
     glEnd()
 
 def reset_game():
-    global plane_y_change, birds, passed_birds, rockets, beam, beams, clouds, score, level, game_over, play
-    plane_y_change = -100
+    global plane_y_change, birds, rockets, beams, clouds, score, level, game_over, play
+    plane_y_change = 0
     birds = []
-    passed_birds = []
     rockets = []
-    beam = [False, -220, 0]
     beams = []
     clouds = []
     score = 0
@@ -68,7 +64,7 @@ def keyboardListener(key, x, y):
     if key == b's':
         plane_y_change -= 20
     if key == b' ':  # Shoot beam when space is pressed
-        beams.append([-145, plane_y_change + 4])  # Add a new beam starting at the plane's nose position
+        beams.append([-145, plane_y_change + 3])  # Add a new beam starting at the plane's nose position
     if key == b'p':  # Toggle play/pause state when 'p' is pressed
         play = not play
 
@@ -491,14 +487,8 @@ def draw_character(char, x_offset, y_offset, scale=1):
 
 def draw_text(text, x, y, scale=1):
     for i, char in enumerate(text):
-        draw_character(char, x + i * 12 * scale, y, scale)
+        draw_character(char, x + i * 12 * scale, y, scale)    
 
-def draw_game_over_message():
-    draw_text("GAME OVER!", -50, 20, 2)
-
-def draw_score_message(score):
-    draw_text(f"SCORE: {score}", -50, -20, 2)
-        
 def init():
     glClearColor(0,0,0,0)
     glMatrixMode(GL_PROJECTION)
@@ -509,8 +499,7 @@ def controlButtons():
     global play  # Use the global play variable
 
     glColor3f(0, 0, 0)
-    for i in range(225, 255):
-        drawLine(-250, i, 250, i, 2)
+    drawLine(-250, 237, 250, 237, 35)
 
     # Left arrow button
     glColor3f(0, 0.4, 0.6)
@@ -534,8 +523,6 @@ def controlButtons():
         drawLine(-5, 245, 15, 235, 2)
         drawLine(-5, 225, 15, 235, 2)
 
-    glColor3f(1, 0.7, 0)
-
 def drawScenery():
     # Sky color
     glColor3f(0.529, 0.808, 0.922)
@@ -552,7 +539,7 @@ def drawScenery():
     
     # Ground at bottom
     glColor3f(0.2, 0.2, 0.2)
-    drawLine(-250, -250, 250, -250, 10)
+    drawLine(-250, -250, 250, -250, 20)
 
 def drawPlane():
     global plane_coordinates,plane_y_change
@@ -564,7 +551,7 @@ def drawPlane():
         drawLine(fuselage[i][0],fuselage[i][1]+plane_y_change, fuselage[(i + 1) % len(fuselage)][0], fuselage[(i + 1) % len(fuselage)][1]+plane_y_change, 4)
 
     # Cockpit
-    glColor3f(0.5, 0.8, 1.0)  # Light blue
+    glColor3f(0.8, 0, 0)  # Red color
     cockpit = plane_coordinates["cockpit"]
     for i in range(len(cockpit) - 1):
         drawLine(cockpit[i][0],cockpit[i][1]+plane_y_change, cockpit[i + 1][0],cockpit[i + 1][1]+plane_y_change, 2)
@@ -627,14 +614,6 @@ def draw_rocket_midpoint():
             glColor3f(1.0, 0.8, 0.0)  # Yellow
             drawLine(rocket_x + 2 * 2, rocket_y + 2 * 2, rocket_x + 8 * 2, rocket_y, s=2)
             drawLine(rocket_x + 2 * 2, rocket_y + rocket_width - 2 * 2, rocket_x + 8 * 2, rocket_y + rocket_width, s=2)
-
-def draw_beam():
-    global beam
-    if beam[0]:
-        beam_x = beam[1]
-        beam_y = beam[2]
-        glColor3f(1.0, 1.0, 0.0)  # Yellow beam
-        drawLine(beam_x, beam_y, beam_x + 20, beam_y, 4)
         
 def draw_beams():
     global beams
@@ -642,11 +621,7 @@ def draw_beams():
     for beam in beams:
         beam_x = beam[0]
         beam_y = beam[1]
-        # Draw the edges of the beam using the midpoint line algorithm
-        drawLine(beam_x, beam_y, beam_x + 20, beam_y, 2)  # Bottom edge
-        drawLine(beam_x + 20, beam_y, beam_x + 20, beam_y + 2, 2)  # Right edge
-        drawLine(beam_x + 20, beam_y + 2, beam_x, beam_y + 2, 2)  # Top edge
-        drawLine(beam_x, beam_y + 2, beam_x, beam_y, 2)  # Left edge
+        drawLine(beam_x, beam_y, beam_x + 20, beam_y, 4)  # Draw beam
              
 def drawBird():
     global birds
@@ -765,13 +740,13 @@ def display():
         # Display game complete message and score
         glColor3f(0.0, 1.0, 0.0)  # Green color
         draw_text("MISSION COMPLETE!", -200, 20, 2)
-        draw_score_message(score)
+        draw_text(f"SCORE: {score}", -50, -20, 2)
     
     elif game_over:
         # Display game over message and score
         glColor3f(1.0, 0.0, 0.0)  # Red color
-        draw_game_over_message()
-        draw_score_message(score)
+        draw_text("GAME OVER!", -50, 20, 2)
+        draw_text(f"SCORE: {score}", -50, -20, 2)
     else:
         drawScenery()
         drawPlane()
